@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  asterisk:
+    build: ./asterisk
+    ports:
+      - "5060:5060/udp"
+      - "8088:8088"  # ARI API
+    networks:
+      - asterisk-net
+
+  redis:
+    image: redis:latest
+    networks:
+      - asterisk-net
+
+  init-redis:
+    build: ./ari-app
+    depends_on:
+      - redis
+    networks:
+      - asterisk-net
+
+  ari-app:
+    build: ./ari-app
+    depends_on:
+      - redis
+      - asterisk
+    networks:
+      - asterisk-net
+
+networks:
+  asterisk-net:
